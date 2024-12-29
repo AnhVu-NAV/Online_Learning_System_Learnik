@@ -1,6 +1,6 @@
 import { Avatar, Button, Dropdown, Modal } from 'antd';
 import { useFormik } from 'formik';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import * as Yup from 'yup';
 import { useLogin, useRegister } from '../../../apis/auth.api';
@@ -9,6 +9,7 @@ import { AuthContext } from '../../../contexts/AuthContext';
 import FormLogin from './components/FormLogin';
 import FormRegister from './components/FormRegister';
 import './navigation.css';
+import ROLE from '../../../config/role';
 
 const registerSchema = Yup.object().shape({
 	email: Yup.string().required('Email là bắt buộc').email('Email chưa hợp lệ'),
@@ -39,6 +40,29 @@ const Navigation = () => {
 
 	const { user } = authState;
 	const isLogined = authState.token;
+	const role = user?.role;
+
+	const [isShowModal, setIsShowModal] = useState(false);
+	const [statusModal, setStatusModal] = useState(null);
+
+	const handleShowModal = () => {
+		setIsShowModal(true);
+	};
+
+	const handleCloseModal = () => {
+		if (statusModal === 'login') {
+			formLogin.handleReset();
+		}
+		if (statusModal === 'register') {
+			formRegister.handleReset();
+		}
+		setIsShowModal(false);
+	};
+
+	const handleSetStatusModal = (status) => {
+		setStatusModal(status);
+		handleShowModal();
+	};
 
 	const { mutate: login, isPending: isLoadingLogin } = useLogin({
 		onSuccess: (data) => {
@@ -50,6 +74,7 @@ const Navigation = () => {
 			const token = data.data.token;
 
 			loginSystem(token);
+			setIsShowModal(false);
 		},
 		onError: () => {
 			openNotification({
@@ -69,6 +94,7 @@ const Navigation = () => {
 			const token = data.data.token;
 
 			loginSystem(token);
+			setIsShowModal(false);
 		},
 		onError: () => {
 			openNotification({
@@ -105,50 +131,35 @@ const Navigation = () => {
 		},
 	});
 
-	const [isShowModal, setIsShowModal] = useState(false);
-	const [statusModal, setStatusModal] = useState(null);
+	const items = useMemo(() => {
+		const result = [
+			{
+				key: '1',
+				label: <Link to='/profile'>Thông tin</Link>,
+			},
+			{
+				key: '2',
+				label: <Link to='/profile'>Đổi mật khẩu</Link>,
+			},
+			{
+				key: '3',
+				label: <div>Đăng xuất</div>,
+				onClick: () => logoutSystem(),
+			},
+		];
 
-	const handleShowModal = () => {
-		setIsShowModal(true);
-	};
-
-	const handleCloseModal = () => {
-		if (statusModal === 'login') {
-			formLogin.handleReset();
+		if (role === ROLE.ADMIN || role === ROLE.TEACHER) {
+			result.push({
+				type: 'divider',
+			});
+			result.push({
+				key: '4',
+				label: <Link to='/admin'>Quản trị</Link>,
+			});
 		}
-		if (statusModal === 'register') {
-			formRegister.handleReset();
-		}
-		setIsShowModal(false);
-	};
 
-	const handleSetStatusModal = (status) => {
-		setStatusModal(status);
-		handleShowModal();
-	};
-
-	const items = [
-		{
-			key: '1',
-			label: <Link to='/profile'>Thông tin</Link>,
-		},
-		{
-			key: '2',
-			label: <Link to='/profile'>Đổi mật khẩu</Link>,
-		},
-		{
-			key: '3',
-			label: <div>Đăng xuất</div>,
-			onClick: () => logoutSystem(),
-		},
-		{
-			type: 'divider',
-		},
-		{
-			key: '4',
-			label: <Link to='/admin'>Quản trị</Link>,
-		},
-	];
+		return result;
+	}, [role, logoutSystem]);
 
 	const title = statusModal === 'login' ? 'Đăng nhập' : 'Đăng ký';
 
@@ -262,7 +273,10 @@ const Navigation = () => {
 				loading={isLoadingLogin || isLoadingRegister}
 			>
 				{statusModal === 'login' ? (
-					<FormLogin formLogin={formLogin} />
+					<FormLogin
+						formLogin={formLogin}
+						onRegister={() => setStatusModal('register')}
+					/>
 				) : (
 					<FormRegister formRegister={formRegister} />
 				)}

@@ -9,7 +9,7 @@ const AuthProvider = ({ children }) => {
 
 		return {
 			token,
-			user: jwtDecode(token),
+			user: token ? jwtDecode(token) : null,
 		};
 	});
 
