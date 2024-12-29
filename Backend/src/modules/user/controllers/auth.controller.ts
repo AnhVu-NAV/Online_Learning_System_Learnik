@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import generateToken from '../../../utils/generateToken';
 import User from '../models/user.model';
+import jwt from 'jsonwebtoken';
 
 export const registerUser = async (req: Request, res: Response): Promise<any> => {
 	const { email, password, fullName } = req.body;

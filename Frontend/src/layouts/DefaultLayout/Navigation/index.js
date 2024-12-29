@@ -1,8 +1,11 @@
-import { Button, Modal } from 'antd';
+import { Avatar, Button, Dropdown, Modal } from 'antd';
 import { useFormik } from 'formik';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import * as Yup from 'yup';
+import { useLogin, useRegister } from '../../../apis/auth.api';
+import openNotification from '../../../config/notification';
+import { AuthContext } from '../../../contexts/AuthContext';
 import FormLogin from './components/FormLogin';
 import FormRegister from './components/FormRegister';
 import './navigation.css';
@@ -28,6 +31,53 @@ const loginSchema = Yup.object().shape({
 });
 
 const Navigation = () => {
+	const {
+		authState,
+		login: loginSystem,
+		logout: logoutSystem,
+	} = useContext(AuthContext);
+
+	const { user } = authState;
+	const isLogined = authState.token;
+
+	const { mutate: login, isPending: isLoadingLogin } = useLogin({
+		onSuccess: (data) => {
+			openNotification({
+				type: 'success',
+				message: 'Đăng nhập thành công',
+			});
+
+			const token = data.data.token;
+
+			loginSystem(token);
+		},
+		onError: () => {
+			openNotification({
+				type: 'error',
+				message: 'Đăng nhập thất bại',
+			});
+		},
+	});
+
+	const { mutate: register, isPending: isLoadingRegister } = useRegister({
+		onSuccess: (data) => {
+			openNotification({
+				type: 'success',
+				message: 'Đăng ký thành công',
+			});
+
+			const token = data.data.token;
+
+			loginSystem(token);
+		},
+		onError: () => {
+			openNotification({
+				type: 'error',
+				message: 'Đăng ký thất bại',
+			});
+		},
+	});
+
 	const formRegister = useFormik({
 		initialValues: {
 			email: '',
@@ -35,8 +85,10 @@ const Navigation = () => {
 			password: '',
 		},
 		validationSchema: registerSchema,
+		validateOnBlur: false,
+		validateOnChange: false,
 		onSubmit: (values) => {
-			alert(JSON.stringify(values, null, 2));
+			register(values);
 		},
 	});
 
@@ -46,8 +98,10 @@ const Navigation = () => {
 			password: '',
 		},
 		validationSchema: loginSchema,
+		validateOnBlur: false,
+		validateOnChange: false,
 		onSubmit: (values) => {
-			alert(JSON.stringify(values, null, 2));
+			login(values);
 		},
 	});
 
@@ -85,6 +139,7 @@ const Navigation = () => {
 		{
 			key: '3',
 			label: <div>Đăng xuất</div>,
+			onClick: () => logoutSystem(),
 		},
 		{
 			type: 'divider',
@@ -171,27 +226,28 @@ const Navigation = () => {
 					</div>
 
 					<div className='profile'>
-						{/* Đã đăng nhập */}
-						{/* <Dropdown menu={{ items }} placement='top'>
-							<Avatar size='large' style={{ width: '55px', height: '55px' }}>
-								D
-							</Avatar>
-						</Dropdown> */}
-						{/* Chưa đăng nhập */}
-						<>
-							<Button
-								style={{ margin: '0px 8px' }}
-								onClick={() => handleSetStatusModal('register')}
-							>
-								Đăng ký
-							</Button>
-							<Button
-								style={{ margin: '0px 8px' }}
-								onClick={() => handleSetStatusModal('login')}
-							>
-								Đăng nhập
-							</Button>
-						</>
+						{isLogined ? (
+							<Dropdown menu={{ items }} placement='top'>
+								<Avatar size='large' style={{ width: '55px', height: '55px' }}>
+									{user.fullName.charAt(0).toUpperCase()}
+								</Avatar>
+							</Dropdown>
+						) : (
+							<>
+								<Button
+									style={{ margin: '0px 8px' }}
+									onClick={() => handleSetStatusModal('register')}
+								>
+									Đăng ký
+								</Button>
+								<Button
+									style={{ margin: '0px 8px' }}
+									onClick={() => handleSetStatusModal('login')}
+								>
+									Đăng nhập
+								</Button>
+							</>
+						)}
 					</div>
 				</div>
 			</nav>
@@ -203,9 +259,10 @@ const Navigation = () => {
 				onCancel={handleCloseModal}
 				onOk={handleSubmit}
 				maskClosable={false}
+				loading={isLoadingLogin || isLoadingRegister}
 			>
 				{statusModal === 'login' ? (
-					<FormLogin formLogin={formLogin}/>
+					<FormLogin formLogin={formLogin} />
 				) : (
 					<FormRegister formRegister={formRegister} />
 				)}

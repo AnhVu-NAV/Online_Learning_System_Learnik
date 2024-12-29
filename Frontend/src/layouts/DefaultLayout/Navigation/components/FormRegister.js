@@ -17,6 +17,7 @@ const FormRegister = ({ formRegister }) => {
 					size='large'
 					name='email'
 					onChange={formRegister.handleChange}
+					onBlur={formRegister.handleBlur}
 					value={formRegister.values.email}
 				/>
 			</Form.Item>
@@ -34,6 +35,7 @@ const FormRegister = ({ formRegister }) => {
 					size='large'
 					name='fullName'
 					onChange={formRegister.handleChange}
+					onBlur={formRegister.handleBlur}
 					value={formRegister.values.fullName}
 				/>
 			</Form.Item>
@@ -44,13 +46,14 @@ const FormRegister = ({ formRegister }) => {
 						required: true,
 					},
 				]}
-				validateStatus={formRegister.errors.email && 'error'}
-				help={formRegister.errors.email && formRegister.errors.email}
+				validateStatus={formRegister.errors.password && 'error'}
+				help={formRegister.errors.password && formRegister.errors.password}
 			>
 				<Input.Password
 					size='large'
 					name='password'
 					onChange={formRegister.handleChange}
+					onBlur={formRegister.handleBlur}
 					value={formRegister.values.password}
 				/>
 			</Form.Item>

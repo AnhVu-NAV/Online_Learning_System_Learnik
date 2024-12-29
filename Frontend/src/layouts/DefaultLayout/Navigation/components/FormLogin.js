@@ -17,6 +17,7 @@ const FormLogin = ({ onRegister, formLogin }) => {
 					size='large'
 					name='email'
 					onChange={formLogin.handleChange}
+					onBlur={formLogin.handleBlur}
 					value={formLogin.values.email}
 				/>
 			</Form.Item>
@@ -35,6 +36,7 @@ const FormLogin = ({ onRegister, formLogin }) => {
 					size='large'
 					name='password'
 					onChange={formLogin.handleChange}
+					onBlur={formLogin.handleBlur}
 					value={formLogin.values.password}
 				/>
 			</Form.Item>
