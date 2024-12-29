@@ -5,18 +5,21 @@ import { useContext } from 'react';
 export const BASE_URL = 'http://localhost:4000';
 
 const axiosInstance = axios.create({
-	baseURL: BASE_URL,
 	timeout: 10000,
 });
 
-axiosInstance.interceptors.request.use(
+axios.interceptors.request.use(
 	(config) => {
-		const { authState } = useContext(AuthContext);
-		const token = authState.token ?? '';
+		console.log('config');
+		const token = localStorage.getItem('token') ?? '';
+
+		console.log('token: ', token);
 
 		if (token) {
 			config.headers['authorization'] = `Bearer ${token}`;
 		}
+
+		console.log('config: ', config);
 
 		return config;
 	},
