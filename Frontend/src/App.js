@@ -3,7 +3,6 @@ import DefaultLayout from './layouts/DefaultLayout';
 import Home from './pages/Home';
 import ListExams from './pages/ListExams';
 import Contact from './pages/Contact';
-import DetailExam from './pages/DetailExam';
 import Transcript from './pages/Transcript';
 import Profile from './pages/Profile';
 import ChangePassword from './pages/ChangePassword';
@@ -13,6 +12,9 @@ import ManageExams from './pages/Admin/ManageExams';
 import CreateExam from './pages/Admin/ManageExams/CreateExam';
 import ManageUsers from './pages/Admin/ManageUsers';
 import ManageFeedback from './pages/Admin/ManageFeedback';
+import Courses from './pages/Courses';
+import Disscusion from './pages/Disscusion';
+import DetailExam from './pages/ListExams/DetailExam';
 
 const App = () => {
 	return (
@@ -22,6 +24,8 @@ const App = () => {
 				<Route path='list-exams' element={<ListExams />} />
 				<Route path='list-exams/:id' element={<DetailExam />} />
 				<Route path='contact' element={<Contact />} />
+				<Route path='courses' element={<Courses />} />
+				<Route path='disscusion' element={<Disscusion />} />
 				<Route path='transcript' element={<Transcript />} />
 				<Route path='profile' element={<Profile />} />
 				<Route path='change-password' element={<ChangePassword />} />

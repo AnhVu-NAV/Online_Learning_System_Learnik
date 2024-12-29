@@ -141,7 +141,7 @@ const Navigation = () => {
 			<nav className='nav-app'>
 				<div className='wrapper'>
 					<div className='logo'>
-						<Link to='#'>Thi Online</Link>
+						<Link to='#'>Education</Link>
 					</div>
 					<input type='radio' name='slider' id='menu-btn' />
 					<input type='radio' name='slider' id='close-btn' />
@@ -151,6 +151,9 @@ const Navigation = () => {
 						</label>
 						<li>
 							<NavLink to='/'>Trang chủ</NavLink>
+						</li>
+						<li>
+							<NavLink to='/courses'>Khóa học</NavLink>
 						</li>
 						<li>
 							<NavLink to='/list-exams?subject=all' className='desktop-item'>
@@ -179,6 +182,9 @@ const Navigation = () => {
 									<NavLink to='/list-exams?subject=nodejs'>NodeJS</NavLink>
 								</li>
 							</ul>
+						</li>
+						<li>
+							<NavLink to='/disscusion'>Thảo luận - Hỏi đáp</NavLink>
 						</li>
 						<li>
 							<NavLink to='/transcript'>Bảng điểm</NavLink>
