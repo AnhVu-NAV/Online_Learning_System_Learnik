@@ -1,119 +1,78 @@
-import { Avatar, Button, Checkbox, Dropdown, Form, Input, Modal } from 'antd';
-import React from 'react';
+import { Button, Modal } from 'antd';
+import { useFormik } from 'formik';
+import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import * as Yup from 'yup';
+import FormLogin from './components/FormLogin';
+import FormRegister from './components/FormRegister';
 import './navigation.css';
 
-const FormLogin = ({ onRegister, formLogin }) => {
-	return (
-		<Form name='basic' layout='vertical'>
-			<Form.Item
-				label='Email'
-				rules={[
-					{
-						required: true,
-					},
-				]}
-				validateStatus={formLogin.errors.email && 'error'}
-				help={formLogin.errors.email && formLogin.errors.email}
-			>
-				<Input
-					size='large'
-					name='email'
-					onChange={formLogin.handleChange}
-					value={formLogin.values.email}
-				/>
-			</Form.Item>
+const registerSchema = Yup.object().shape({
+	email: Yup.string().required('Email là bắt buộc').email('Email chưa hợp lệ'),
+	fullName: Yup.string()
+		.required('Tên người dùng là bắt buộc')
+		.min(2, 'Tên người dùng chưa hợp lệ')
+		.max(50, 'Tên người dùng chưa hợp lệ'),
+	password: Yup.string()
+		.required('Mật khẩu là bắt buộc')
+		.min(6, 'Mật khẩu quá ngắn')
+		.max(24, 'Mật khẩu quá dài'),
+});
 
-			<Form.Item
-				label='Mật khẩu'
-				rules={[
-					{
-						required: true,
-					},
-				]}
-				validateStatus={formLogin.errors.password && 'error'}
-				help={formLogin.errors.password && formLogin.errors.password}
-			>
-				<Input.Password
-					size='large'
-					name='password'
-					onChange={formLogin.handleChange}
-					value={formLogin.values.password}
-				/>
-			</Form.Item>
-
-			<div style={{ display: 'flex', justifyContent: 'space-between' }}>
-				<Form.Item name='remember' valuePropName='checked'>
-					<Checkbox>Ghi nhớ mật khẩu</Checkbox>
-				</Form.Item>
-
-				<Button type='link' onClick={onRegister}>
-					Đăng ký
-				</Button>
-			</div>
-		</Form>
-	);
-};
-
-const FormRegister = ({ formRegister }) => {
-	return (
-		<Form name='basic' layout='vertical'>
-			<Form.Item
-				label='Email'
-				rules={[
-					{
-						required: true,
-					},
-				]}
-				validateStatus={formRegister.errors.email && 'error'}
-				help={formRegister.errors.email && formRegister.errors.email}
-			>
-				<Input
-					size='large'
-					name='email'
-					onChange={formRegister.handleChange}
-					value={formRegister.values.email}
-				/>
-			</Form.Item>
-			<Form.Item
-				label='Tên tài khoản'
-				rules={[
-					{
-						required: true,
-					},
-				]}
-				validateStatus={formRegister.errors.username && 'error'}
-				help={formRegister.errors.username && formRegister.errors.username}
-			>
-				<Input
-					size='large'
-					name='username'
-					onChange={formRegister.handleChange}
-					value={formRegister.values.username}
-				/>
-			</Form.Item>
-			<Form.Item
-				label='Mật khẩu'
-				rules={[
-					{
-						required: true,
-					},
-				]}
-				validateStatus={formRegister.errors.email && 'error'}
-				help={formRegister.errors.email && formRegister.errors.email}
-			>
-				<Input.Password
-					size='large'
-					name='password'
-					onChange={formRegister.handleChange}
-					value={formRegister.values.password}
-				/>
-			</Form.Item>
-		</Form>
-	);
-};
+const loginSchema = Yup.object().shape({
+	email: Yup.string().required('Email là bắt buộc').email('Email chưa hợp lệ'),
+	password: Yup.string()
+		.required('Mật khẩu là bắt buộc')
+		.min(6, 'Mật khẩu quá ngắn')
+		.max(24, 'Mật khẩu quá dài'),
+});
 
 const Navigation = () => {
+	const formRegister = useFormik({
+		initialValues: {
+			email: '',
+			fullName: '',
+			password: '',
+		},
+		validationSchema: registerSchema,
+		onSubmit: (values) => {
+			alert(JSON.stringify(values, null, 2));
+		},
+	});
+
+	const formLogin = useFormik({
+		initialValues: {
+			email: '',
+			password: '',
+		},
+		validationSchema: loginSchema,
+		onSubmit: (values) => {
+			alert(JSON.stringify(values, null, 2));
+		},
+	});
+
+	const [isShowModal, setIsShowModal] = useState(false);
+	const [statusModal, setStatusModal] = useState(null);
+
+	const handleShowModal = () => {
+		setIsShowModal(true);
+	};
+
+	const handleCloseModal = () => {
+		if (statusModal === 'login') {
+			formLogin.handleReset();
+		}
+		if (statusModal === 'register') {
+			formRegister.handleReset();
+		}
+		setIsShowModal(false);
+	};
+
+	const handleSetStatusModal = (status) => {
+		setStatusModal(status);
+		handleShowModal();
+	};
+
 	const items = [
 		{
 			key: '1',
@@ -136,92 +95,120 @@ const Navigation = () => {
 		},
 	];
 
+	const title = statusModal === 'login' ? 'Đăng nhập' : 'Đăng ký';
+
+	const handleSubmit = () => {
+		console.log('statusModal: ', statusModal);
+		if (statusModal === 'login') {
+			formLogin.handleSubmit();
+		} else {
+			formRegister.handleSubmit();
+		}
+	};
+
 	return (
 		<>
 			<nav className='nav-app'>
-				<div className='wrapper'>
-					<div className='logo'>
+				<div className='relative max-w-[90%] py-0 px-3 h-[70px] leading-[70px] m-auto flex items-center justify-between'>
+					<div className='logo text-white text-2xl font-bold'>
 						<Link to='#'>Education</Link>
 					</div>
-					<input type='radio' name='slider' id='menu-btn' />
-					<input type='radio' name='slider' id='close-btn' />
-					<ul className='nav-links'>
-						<label htmlFor='close-btn' className='btn close-btn'>
-							<i className='fas fa-times' />
-						</label>
-						<li>
-							<NavLink to='/'>Trang chủ</NavLink>
-						</li>
-						<li>
-							<NavLink to='/courses'>Khóa học</NavLink>
-						</li>
-						<li>
-							<NavLink to='/list-exams?subject=all' className='desktop-item'>
-								Môn thi
-							</NavLink>
-							<input type='checkbox' id='showDrop' />
-							<label htmlFor='showDrop' className='mobile-item'>
-								Dropdown Menu
+					<div>
+						<input type='radio' name='slider' id='menu-btn' />
+						<input type='radio' name='slider' id='close-btn' />
+						<ul className='nav-links flex'>
+							<label htmlFor='close-btn' className='btn close-btn'>
+								<i className='fas fa-times' />
 							</label>
-							<ul className='drop-menu'>
-								<li>
-									<NavLink to='/list-exams?subject=html'>HTML</NavLink>
-								</li>
-								<li>
-									<NavLink to='/list-exams?subject=css'>CSS</NavLink>
-								</li>
-								<li>
-									<NavLink to='/list-exams?subject=javascript'>
-										Javascript
-									</NavLink>
-								</li>
-								<li>
-									<NavLink to='/list-exams?subject=reactjs'>ReactJS</NavLink>
-								</li>
-								<li>
-									<NavLink to='/list-exams?subject=nodejs'>NodeJS</NavLink>
-								</li>
-							</ul>
-						</li>
-						<li>
-							<NavLink to='/disscusion'>Thảo luận - Hỏi đáp</NavLink>
-						</li>
-						<li>
-							<NavLink to='/transcript'>Bảng điểm</NavLink>
-						</li>
+							<li>
+								<NavLink to='/'>Trang chủ</NavLink>
+							</li>
+							<li>
+								<NavLink to='/courses'>Khóa học</NavLink>
+							</li>
+							<li>
+								<NavLink to='/list-exams?subject=all' className='desktop-item'>
+									Môn thi
+								</NavLink>
+								<input type='checkbox' id='showDrop' />
+								<label htmlFor='showDrop' className='mobile-item'>
+									Dropdown Menu
+								</label>
+								<ul className='drop-menu'>
+									<li>
+										<NavLink to='/list-exams?subject=html'>HTML</NavLink>
+									</li>
+									<li>
+										<NavLink to='/list-exams?subject=css'>CSS</NavLink>
+									</li>
+									<li>
+										<NavLink to='/list-exams?subject=javascript'>
+											Javascript
+										</NavLink>
+									</li>
+									<li>
+										<NavLink to='/list-exams?subject=reactjs'>ReactJS</NavLink>
+									</li>
+									<li>
+										<NavLink to='/list-exams?subject=nodejs'>NodeJS</NavLink>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<NavLink to='/disscusion'>Thảo luận - Hỏi đáp</NavLink>
+							</li>
+							<li>
+								<NavLink to='/transcript'>Bảng điểm</NavLink>
+							</li>
 
-						<li>
-							<NavLink to='/contact'>Liên hệ</NavLink>
-						</li>
-					</ul>
-					<label htmlFor='menu-btn' className='btn menu-btn'>
-						<i className='fas fa-bars' />
-					</label>
+							<li>
+								<NavLink to='/contact'>Liên hệ</NavLink>
+							</li>
+						</ul>
+						<label htmlFor='menu-btn' className='btn menu-btn'>
+							<i className='fas fa-bars' />
+						</label>
+					</div>
 
 					<div className='profile'>
 						{/* Đã đăng nhập */}
-						<Dropdown menu={{ items }} placement='top'>
+						{/* <Dropdown menu={{ items }} placement='top'>
 							<Avatar size='large' style={{ width: '55px', height: '55px' }}>
 								D
 							</Avatar>
-						</Dropdown>
+						</Dropdown> */}
 						{/* Chưa đăng nhập */}
-						{/* <>
-							<Button style={{ margin: '0px 8px' }}>Đăng ký</Button>
-							<Button style={{ margin: '0px 8px' }}>Đăng nhập</Button>
-						</> */}
+						<>
+							<Button
+								style={{ margin: '0px 8px' }}
+								onClick={() => handleSetStatusModal('register')}
+							>
+								Đăng ký
+							</Button>
+							<Button
+								style={{ margin: '0px 8px' }}
+								onClick={() => handleSetStatusModal('login')}
+							>
+								Đăng nhập
+							</Button>
+						</>
 					</div>
 				</div>
 			</nav>
 			<Modal
-				title={'Đăng nhập'}
-				open={false}
-				okText={'Đăng nhập'}
+				title={title}
+				open={isShowModal}
+				okText={title}
 				cancelText='Đóng lại'
+				onCancel={handleCloseModal}
+				onOk={handleSubmit}
 				maskClosable={false}
 			>
-				<FormLogin />
-				{/* <FormRegister /> */}
+				{statusModal === 'login' ? (
+					<FormLogin formLogin={formLogin}/>
+				) : (
+					<FormRegister formRegister={formRegister} />
+				)}
 			</Modal>
 		</>
 	);
