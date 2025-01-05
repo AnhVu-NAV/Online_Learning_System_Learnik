@@ -13,8 +13,9 @@ const AuthProvider = ({ children }) => {
 		};
 	});
 
-	const login = (token) => {
+	const login = (token, refreshToken) => {
 		localStorage.setItem('token', token);
+		localStorage.setItem('refreshToken', refreshToken);
 		setAuthState({ token, user: jwtDecode(token) });
 	};
 

@@ -1,10 +1,14 @@
 import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
+import authenticateRefreshToken from '../../../utils/authenticateRefreshToken';
 import generateToken from '../../../utils/generateToken';
-import User from '../models/user.model';
-import jwt from 'jsonwebtoken';
+import User, { IUser } from '../models/user.model';
+import generateRefreshToken from '../../../utils/generateRefreshToken';
 
-export const registerUser = async (req: Request, res: Response): Promise<any> => {
+export const registerUser = async (
+	req: Request,
+	res: Response
+): Promise<any> => {
 	const { email, password, fullName } = req.body;
 
 	try {
@@ -35,33 +39,59 @@ export const registerUser = async (req: Request, res: Response): Promise<any> =>
 	}
 };
 
-
 export const loginUser = async (req: Request, res: Response): Promise<any> => {
-    const {email, password} = req.body;
+	const { email, password } = req.body;
 
-    try{
-        const user = await User.findOne({email});
+	try {
+		const user = await User.findOne({ email });
 
-        if(!user){
-            return res.status(400).json({message: 'Email chưa tồn tại'})
-        }
+		if (!user) {
+			return res.status(400).json({ message: 'Email chưa tồn tại' });
+		}
 
-        const isMatch = await bcrypt.compare(password, user.password);
+		const isMatch = await bcrypt.compare(password, user.password);
 
-        if(!isMatch){
-            return res.status(400).json({
-                message: 'Mật khẩu không trùng khớp'
-            })
-        }
+		if (!isMatch) {
+			return res.status(400).json({
+				message: 'Mật khẩu không trùng khớp',
+			});
+		}
 
-        const token = generateToken(user);
+		const token = generateToken(user);
+		const refreshToken = generateRefreshToken(user)
 
-        res.json({
-            message: 'Đăng nhập thành công',
-            token
-        })
-    } catch(err){
-        console.error(err);
+		res.json({
+			message: 'Đăng nhập thành công',
+			token,
+			refreshToken
+		});
+	} catch (err) {
+		console.error(err);
 		res.status(500).send('Server error');
-    }
-}
+	}
+};
+
+export const refreshToken = async (
+	req: Request,
+	res: Response
+): Promise<any> => {
+	const { refreshToken } = req.body;
+
+	if (!refreshToken) {
+		return res.status(401).json({
+			message: 'Refresh token is required',
+		});
+	}
+
+	try {
+		const decoded = authenticateRefreshToken(refreshToken) as IUser;
+		const token = generateToken(decoded);
+
+		res.json({
+			token,
+		});
+	} catch (err) {
+		console.error(err);
+		res.status(403).send('Invalid or expired refresh token');
+	}
+};

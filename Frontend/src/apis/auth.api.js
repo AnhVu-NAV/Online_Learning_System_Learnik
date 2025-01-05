@@ -1,20 +1,17 @@
 import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
-import { BASE_URL } from '../config/axios';
-
-const URI_AUTH = `${BASE_URL}/api/auth`;
+import axiosInstance from '../config/axios';
 
 const URI = {
-	login: `${URI_AUTH}/login`,
-	register: `${URI_AUTH}/register`,
+	login: `/auth/login`,
+	register: `/auth/register`,
 };
 
 const auth = {
 	login: (payload) => {
-		return axios.post(URI.login, payload);
+		return axiosInstance.post(URI.login, payload);
 	},
 	register: (payload) => {
-		return axios.post(URI.register, payload);
+		return axiosInstance.post(URI.register, payload);
 	},
 };
 

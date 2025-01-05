@@ -72,8 +72,9 @@ const Navigation = () => {
 			});
 
 			const token = data.data.token;
+			const refreshToken = data.data.refreshToken;
 
-			loginSystem(token);
+			loginSystem(token, refreshToken);
 			setIsShowModal(false);
 		},
 		onError: () => {
