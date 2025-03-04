@@ -12,11 +12,13 @@ import scheduleRoutes from './modules/schedule/routes/schedule.route';
 import discussionRoutes from './modules/discussion/routes/discussion.route';
 import usersQuizzesRoutes from './modules/users_quizzes/routes/users_quizzes.route';
 import questionRoutes from './modules/question/routes/question.route';
+import paymentRoutes from './modules/payment/routes/payment.route';
+ // ✅ Cho phép tất cả frontend gọi API
 
 
 const app = express();
 const apiRouter = express.Router();
-
+app.use(cors()); 
 connectDB();
 
 app.use(express.json());
@@ -33,6 +35,7 @@ apiRouter.use('/schedules', scheduleRoutes);
 apiRouter.use('/discussions', discussionRoutes);
 apiRouter.use('/users-quizzes', usersQuizzesRoutes);
 apiRouter.use('/questions', questionRoutes);
+apiRouter.use('/payments', paymentRoutes);
 
 // Áp dụng prefix global
 app.use('/api/v1', apiRouter);

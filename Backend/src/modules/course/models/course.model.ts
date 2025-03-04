@@ -5,6 +5,7 @@ export interface ICourse extends Document {
 	description: string;
 	instructorId: mongoose.Schema.Types.ObjectId;
 	lessons: mongoose.Schema.Types.ObjectId[];
+	imageUrl: string;  // ✅ Thêm trường này để lưu ảnh khóa học
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -18,8 +19,9 @@ const courseSchema: Schema = new Schema(
 		resources: [{ type: String }],
 		reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
 		quizzes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Quizzes' }],
-		category: { type: String, require: true },
+		category: { type: String, required: true },
 		users: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+		imageUrl: { type: String, required: false },  // ✅ Trường mới để lưu đường dẫn ảnh
 	},
 	{ timestamps: true }
 );

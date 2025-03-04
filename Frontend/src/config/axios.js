@@ -2,10 +2,15 @@ import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
 import { useContext } from 'react';
 
-export const BASE_URL = 'http://localhost:4000';
+export const BASE_URL = 'http://localhost:4000/api/v1';
 
+// Tạo instance axios với cấu hình mặc định
 const axiosInstance = axios.create({
+	baseURL: BASE_URL, // Sử dụng BASE_URL
 	timeout: 10000,
+	headers: {
+		'Content-Type': 'application/json',
+	},
 });
 
 axios.interceptors.request.use(

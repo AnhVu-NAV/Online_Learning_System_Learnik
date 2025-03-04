@@ -1,6 +1,7 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import DefaultLayout from '../layouts/DefaultLayout';
+import AdminLayout from '../layouts/DefaultLayoutAdmin';
 import Home from '../pages/Home';
 import ListExams from '../pages/ListExams';
 import DetailExam from '../pages/ListExams/DetailExam';
@@ -10,6 +11,7 @@ import Disscusion from '../pages/Disscusion';
 import Transcript from '../pages/Transcript';
 import Profile from '../pages/Profile';
 import ChangePassword from '../pages/ChangePassword';
+import Payment from '../pages/Payment';
 import Admin from '../pages/Admin';
 import Dashboard from '../pages/Admin/Dashboard';
 import ManageExams from '../pages/Admin/ManageExams';
@@ -30,6 +32,7 @@ const RoutesApp = () => {
 				<Route path='transcript' element={<Transcript />} />
 				<Route path='profile' element={<Profile />} />
 				<Route path='change-password' element={<ChangePassword />} />
+				<Route path="payment/:courseId" element={<Payment />} />
 			</Route>
 			<Route path='/admin' element={<Admin />}>
 				<Route path='' element={<Dashboard />} />
